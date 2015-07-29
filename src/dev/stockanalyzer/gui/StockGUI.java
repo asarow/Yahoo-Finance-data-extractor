@@ -19,7 +19,6 @@ import dev.stockanalyzer.pulldata.DataExtractor;
  *
  * @author Amandeep Sarow
  */
-
 public class StockGUI extends JFrame {
     private JPanel northPanel = new JPanel();
     private JPanel centerPanel = new JPanel(new GridLayout(DataExtractor
@@ -56,7 +55,8 @@ public class StockGUI extends JFrame {
     /** 
      * Displays the stock labels and stock data. This method is called inside
      * the StockModelViewController class.
-     * @param an array containing various stock information to be displayed
+     * @param stockData an array containing various stock information to be 
+     *                  displayed
      */
     public void displayStockData(String[] stockData) {
 	for (int i = 0; i < stockLabels.length; i++) {
@@ -74,7 +74,8 @@ public class StockGUI extends JFrame {
      * Takes an ActionListener parameter from the model view controller and
      * updates the stock data for a given stock ticker when the 'GO!' button
      * is pressed.
-     * @param an ActionListener for the GO! button from the mvc
+     * @param tickerButtonListener an ActionListener for the GO! button from 
+     *                              the mvc
      */
     public void getStockData(ActionListener tickerButtonListener) {
 	tickerButton.addActionListener(tickerButtonListener);
@@ -84,7 +85,8 @@ public class StockGUI extends JFrame {
      * Takes an ActionListener parameter from the model view controller and
      * updates the GUI with financial statement information for a given stock
      * ticker.
-     * @param an ActionListener for the Build Financials button
+     * @param financialButtonListener an ActionListener for the Build 
+     *                                Financials button from the mvc
      */
     public void getFinancialData(ActionListener financialButtonListener) {
 	buildFinancialsButton.addActionListener(financialButtonListener);
