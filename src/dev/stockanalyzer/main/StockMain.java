@@ -20,7 +20,6 @@ import dev.stockanalyzer.pulldata.FinancialsExtractor;
  *
  * @author Amandeep Sarow
  */
-
 public class StockMain {
     public static void main(String[] args) {
 	StockGUI gui = new StockGUI();
