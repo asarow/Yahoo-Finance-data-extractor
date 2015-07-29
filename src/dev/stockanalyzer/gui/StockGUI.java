@@ -46,7 +46,8 @@ public class StockGUI extends JFrame {
     
     /** 
      * Getter for the stock ticker symbol input by the user.
-     * @return the stock ticker provided as input by the user
+     *
+     * @return the stock ticker provided as input by the user.
      */
     public String getTicker() {
 	return tickerField.getText();
@@ -55,8 +56,9 @@ public class StockGUI extends JFrame {
     /** 
      * Displays the stock labels and stock data. This method is called inside
      * the StockModelViewController class.
+     *
      * @param stockData an array containing various stock information to be 
-     *                  displayed
+     *                  displayed.
      */
     public void displayStockData(String[] stockData) {
 	for (int i = 0; i < stockLabels.length; i++) {
@@ -74,8 +76,9 @@ public class StockGUI extends JFrame {
      * Takes an ActionListener parameter from the model view controller and
      * updates the stock data for a given stock ticker when the 'GO!' button
      * is pressed.
+     *
      * @param tickerButtonListener an ActionListener for the GO! button from 
-     *                              the mvc
+     *                              the mvc.
      */
     public void getStockData(ActionListener tickerButtonListener) {
 	tickerButton.addActionListener(tickerButtonListener);
@@ -85,8 +88,9 @@ public class StockGUI extends JFrame {
      * Takes an ActionListener parameter from the model view controller and
      * updates the GUI with financial statement information for a given stock
      * ticker.
+     *
      * @param financialButtonListener an ActionListener for the Build 
-     *                                Financials button from the mvc
+     *                                Financials button from the mvc.
      */
     public void getFinancialData(ActionListener financialButtonListener) {
 	buildFinancialsButton.addActionListener(financialButtonListener);
@@ -103,7 +107,7 @@ public class StockGUI extends JFrame {
 	northPanel.add(buildFinancialsButton);
     }
     
-    /** Adds GUI elements to the center panel */
+    /** Adds GUI elements to the center panel. */
     private void addCenterComponents() {
 	String[] labels = {"Name: ", "" ,
 			   "Price: ", " ", "Change:", " " , "Market Cap:", " ",
@@ -113,7 +117,7 @@ public class StockGUI extends JFrame {
 	}	
     }
     
-    /** Test panel */
+    /** Test panel. */
     private void addSouthComponents() {
 	southPanel.add(new JLabel("Test"));
     }
