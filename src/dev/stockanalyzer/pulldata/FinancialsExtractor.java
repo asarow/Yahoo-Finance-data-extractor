@@ -20,11 +20,11 @@ public class FinancialsExtractor {
     private  List<String[]> incomeStatement = new ArrayList<String[]>();
     private  List<String[]> balanceSheet = new ArrayList<String[]>();
     private  List<String[]> cashFlowsStatement = new ArrayList<String[]>();
-    private  String yahooAPIFinancialBegin = "https://query.yahooapis.com/v1/
-        public/yql?q=SELECT%20*%20FROM%20yahoo.finance.";
+    private  String yahooAPIFinancialBegin = "https://query.yahooapis.com/v1/"
+        + "public/yql?q=SELECT%20*%20FROM%20yahoo.finance.";
     private  String yahooAPIFinancialMid = "%20WHERE%20symbol%3D'";
-    private  String yahooAPIFinancialEnd = "'&diagnostics=true&env=store%3A%2F%
-        2Fdatatables.org%2Falltableswithkeys";
+    private  String yahooAPIFinancialEnd = "'&diagnostics=true&env=store%3A%2F%"
+        + "2Fdatatables.org%2Falltableswithkeys";
     private final String bs = "balancesheet", is = "incomestatement", 
 	cf = "cashflow";
     private final String[] urlModifier = {bs, is, cf};
@@ -55,8 +55,8 @@ public class FinancialsExtractor {
 		try {
 		    istream = url.openStream();  // throws an IOException
 		} catch (IOException io) {
-		    System.out.println("The URL failed to retrieve the stock 
-                    ticker from the API");
+		    System.out.println("The URL failed to retrieve the stock" + 
+                    "ticker from the API");
 		    io.printStackTrace();
 		}
 
