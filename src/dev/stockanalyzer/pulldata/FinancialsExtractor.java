@@ -18,8 +18,8 @@ import java.util.List;
  */
 public class FinancialsExtractor {
     private  ArrayList<ArrayList<String>> incomeStatement = new ArrayList<ArrayList<String>>();
-    private  List<String[]> balanceSheet = new ArrayList<String[]>();
-    private  List<String[]> cashFlowsStatement = new ArrayList<String[]>();
+    private  ArrayList<ArrayList<String>> balanceSheet = new ArrayList<ArrayList<String>>();
+    private  ArrayList<ArrayList<String>> cashFlowsStatement = new ArrayList<ArrayList<String>>();
     private  String yahooAPIFinancialBegin = "https://query.yahooapis.com/v1/"
         + "public/yql?q=SELECT%20*%20FROM%20yahoo.finance.";
     private  String yahooAPIFinancialMid = "%20WHERE%20symbol%3D'";
@@ -100,7 +100,7 @@ public class FinancialsExtractor {
      *
      * @return an array containing the balance sheet information.
      */
-    public List<String[]> getBalanceSheet() {
+    public ArrayList<ArrayList<String>> getBalanceSheet() {
 	return balanceSheet;
     }
     
@@ -109,7 +109,7 @@ public class FinancialsExtractor {
      *
      * @return an array containing the statement of cash flows information.
      */
-    public List<String[]> getCashFlowsStatement() {
+    public ArrayList<ArrayList<String>> getCashFlowsStatement() {
 	return cashFlowsStatement;
     }
     
@@ -164,14 +164,14 @@ public class FinancialsExtractor {
 			String returned = scrapeExcessHTML(line);
 			if (returned.length() > 0) {
 			    //  buildSheet() stores the necessary data
-			    buildSheet(returned.split(" "));
+			    buildSheet(returned.split(" "), is);
 			}
 		    }
 		    
 		    if (startIncrement == true)
 			i++;
 		} // end while
-			printBS();
+			printIS();
 	    } catch (IOException e) {
 		System.out.println("Failed to read from income statement URL");
 		e.printStackTrace();
@@ -223,12 +223,14 @@ public class FinancialsExtractor {
 		    
 		    if (startScraping == true) {
 			String returned = scrapeExcessHTML(line);
-			//if (returned.length() > 0)
-			//System.out.println(returned);
+			if (returned.length() > 0) {
+			    buildSheet(returned.split(" "), bs);
+			}
 		    }
 		    if (startIncrement == true)
 			i++;
-		}
+		} // end while
+		printBS();
 	    } catch (IOException e) {
 		System.out.println("Failed to read from balance sheet URL");
 		e.printStackTrace();
@@ -279,13 +281,15 @@ public class FinancialsExtractor {
 			startIncrement = true;
 		    
 		    if (startScraping == true) {
-			
-			//	if (returned.length() > 0)
-			//System.out.println(returned);
+			String returned = scrapeExcessHTML(line);
+			if (returned.length() > 0) {
+			    buildSheet(returned.split(" " ), cf);
+			}
 		    }
 		    if (startIncrement == true)
 			i++;
-		}
+		} // end while
+		printCF();
 	    } catch (IOException e) {
 		System.out.println("Failed to read from cash flows URL");
 		e.printStackTrace();
@@ -303,7 +307,7 @@ public class FinancialsExtractor {
      *
      * @param line a line of data containing financial information.
      */
-    private void buildSheet(String[] line) {
+    private void buildSheet(String[] line, String statementType) {
 	ArrayList<String> dataToAdd = new ArrayList<String>();
 
 	if (line.length == 0) 
@@ -311,7 +315,13 @@ public class FinancialsExtractor {
 
 	if (line.length == 1 || line[0].equals("-")) {
 	    dataToAdd.add(line[0]);
-	    incomeStatement.add(dataToAdd);
+	    if (statementType.equals(is)) {
+		incomeStatement.add(dataToAdd);
+	    } else if (statementType.equals(bs)) {
+		balanceSheet.add(dataToAdd);
+	    } else {
+		cashFlowsStatement.add(dataToAdd);
+	    }
 	    return;
 	}
 	
@@ -345,7 +355,13 @@ public class FinancialsExtractor {
 
 	} // end for
 	
-	incomeStatement.add(dataToAdd);
+	if (statementType.equals(is)) {
+	    incomeStatement.add(dataToAdd);
+	} else if (statementType.equals(bs)) {
+	    balanceSheet.add(dataToAdd); 
+	} else {
+	    cashFlowsStatement.add(dataToAdd);
+	}
     }
     
     /**
@@ -375,8 +391,8 @@ public class FinancialsExtractor {
 	return lineToModify.trim();
     }
 
-    private void printBS() {
-	
+    private void printIS() {
+	System.out.println("-----\t INCOME STATEMENT \t -----");
 	for (int i = 0; i < incomeStatement.size(); i++) {
 	    for (int j = 0; j < incomeStatement.get(i).size(); j++) {
 		System.out.print(incomeStatement.get(i).get(j)+ " ");
@@ -384,7 +400,30 @@ public class FinancialsExtractor {
 	    } if (i != incomeStatement.size() -1 &&
 		  Character.isAlphabetic(incomeStatement.get(i+1).get(0).charAt(0)))
 		  System.out.println();
-	}
-	
+	}	
+    }
+
+    private void printBS() {
+	System.out.println("-----\t BALANCE SHEET \t -----");
+	for (int i = 0; i < balanceSheet.size(); i++) {
+	    for (int j = 0; j < balanceSheet.get(i).size(); j++) {
+		System.out.print(balanceSheet.get(i).get(j)+ " ");
+		
+	    } if (i != balanceSheet.size() -1 &&
+		  Character.isAlphabetic(balanceSheet.get(i+1).get(0).charAt(0)))
+		  System.out.println();
+	}	
+    }
+
+    private void printCF() {
+	System.out.println("-----\t CF STATEMENT \t -----");
+	for (int i = 0; i < cashFlowsStatement.size(); i++) {
+	    for (int j = 0; j < cashFlowsStatement.get(i).size(); j++) {
+		System.out.print(cashFlowsStatement.get(i).get(j)+ " ");
+		
+	    } if (i != cashFlowsStatement.size() -1 &&
+		  Character.isAlphabetic(cashFlowsStatement.get(i+1).get(0).charAt(0)))
+		  System.out.println();
+	}	
     }
 }
