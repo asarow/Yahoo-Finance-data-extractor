@@ -171,7 +171,7 @@ public class FinancialsExtractor {
 		    if (startIncrement == true)
 			i++;
 		} // end while
-	       	//printIS();
+	       	printIS();
 	    } catch (IOException e) {
 		System.out.println("Failed to read from income statement URL");
 		e.printStackTrace();
@@ -230,7 +230,7 @@ public class FinancialsExtractor {
 		    if (startIncrement == true)
 			i++;
 		} // end while
-		//printBS();
+		printBS();
 	    } catch (IOException e) {
 		System.out.println("Failed to read from balance sheet URL");
 		e.printStackTrace();
@@ -336,9 +336,42 @@ public class FinancialsExtractor {
  	    
 	    if (Character.isAlphabetic(line[i].charAt(0))) {
 		if (line[i].equals("Add")) {
-		    return;
-		}
-
+			boolean periodEnding = false;
+			int counter = 0;
+			String period = "";
+			
+			for (int j=0; j < line.length; j++) {
+			    if (line[j].equals("Ending")) {
+				periodEnding = true;
+			    }
+			    
+			    if (periodEnding == true && !line[j].isEmpty() 
+				&& (line[j].length() == 3 || line[j].length() == 4)) {
+				counter++;
+				period += line[j] + " ";
+				
+				if (counter == 3) {
+				    dataToAdd.add(period);
+				    counter = 0;
+				    period = "";
+				}	
+			    }//  end period ending if-block
+			} // end inner for-loop	
+			
+			if (statementType.equals(is)) {
+			    dataToAdd.add(0, "Income Statement");
+			    incomeStatement.add(dataToAdd);
+			} else if (statementType.equals(bs)) {
+			    dataToAdd.add(0, "Balance Sheet");
+			    balanceSheet.add(dataToAdd);
+			} else {
+			    dataToAdd.add(0, "Statement Of Cash Flows");
+			    cashFlowsStatement.add(dataToAdd);
+			}
+			return;
+		    }// end "add" if block
+		    
+			
 		if (printAgain == false && numeric == true) {
 		    printAgain = true;
 		    numeric = false;
@@ -352,7 +385,7 @@ public class FinancialsExtractor {
 	        }
 		
 	   
-	    }
+	    }// end main IF
 	    
 	    if (Character.isDigit(line[i].charAt(0)) ||
 		Character.isDigit(line[i].charAt(1))) {
@@ -365,12 +398,12 @@ public class FinancialsExtractor {
 		} else {
 		    dataToAdd.add(line[i]);
 		}    
-	    }
+	    } //  end characterNumericCheck if-block
 
 	    if (i == line.length-1 && Character.isAlphabetic(line[i].charAt(0)))
 		dataToAdd.add(combine);
 
-	} // end for
+	} // end main for
 	
 	if (statementType.equals(is)) {
 	    incomeStatement.add(dataToAdd);
@@ -424,7 +457,7 @@ public class FinancialsExtractor {
 	System.out.println("-----\t INCOME STATEMENT \t -----");
 	for (int i = 0; i < incomeStatement.size(); i++) {
 	    for (int j = 0; j < incomeStatement.get(i).size(); j++) {
-		if (Character.isAlphabetic(incomeStatement.get(i).get(j).charAt(0))) {
+		if (i > 0 && Character.isAlphabetic(incomeStatement.get(i).get(j).charAt(0))) {
 		    System.out.println();
 		}
 		System.out.print(incomeStatement.get(i).get(j)+ " ");
@@ -437,7 +470,7 @@ public class FinancialsExtractor {
 	System.out.println("-----\t BALANCE SHEET \t -----");
 	for (int i = 0; i < balanceSheet.size(); i++) {
 	    for (int j = 0; j < balanceSheet.get(i).size(); j++) {
-		if (Character.isAlphabetic(balanceSheet.get(i).get(j).charAt(0))) {
+		if (i > 0 && Character.isAlphabetic(balanceSheet.get(i).get(j).charAt(0))) {
 			System.out.println();
 		    }
 		System.out.print(balanceSheet.get(i).get(j)+ " ");
@@ -452,7 +485,7 @@ public class FinancialsExtractor {
 	System.out.println("-----\t CF STATEMENT \t -----");
 	for (int i = 0; i < cashFlowsStatement.size(); i++) {
 	    for (int j = 0; j < cashFlowsStatement.get(i).size(); j++) {
-		if (Character.isAlphabetic(cashFlowsStatement.get(i).get(j).charAt(0))) {
+		if ( i > 0 && Character.isAlphabetic(cashFlowsStatement.get(i).get(j).charAt(0))) {
 		    System.out.println();
 		}
 		System.out.print(cashFlowsStatement.get(i).get(j)+ " ");
