@@ -17,7 +17,7 @@ import java.util.List;
  * @author Amandeep Sarow
  */
 public class FinancialsExtractor {
-    private  List<String[]> incomeStatement = new ArrayList<String[]>();
+    private  ArrayList<ArrayList<String>> incomeStatement = new ArrayList<ArrayList<String>>();
     private  List<String[]> balanceSheet = new ArrayList<String[]>();
     private  List<String[]> cashFlowsStatement = new ArrayList<String[]>();
     private  String yahooAPIFinancialBegin = "https://query.yahooapis.com/v1/"
@@ -91,7 +91,7 @@ public class FinancialsExtractor {
      *
      * @return an array containing the income statement information.
      */
-    public List<String[]> getIncomeStatement() {
+    public ArrayList<ArrayList<String>> getIncomeStatement() {
 	return incomeStatement;
     }
     
@@ -170,7 +170,8 @@ public class FinancialsExtractor {
 		    
 		    if (startIncrement == true)
 			i++;
-		}
+		} // end while
+			printBS();
 	    } catch (IOException e) {
 		System.out.println("Failed to read from income statement URL");
 		e.printStackTrace();
@@ -303,27 +304,48 @@ public class FinancialsExtractor {
      * @param line a line of data containing financial information.
      */
     private void buildSheet(String[] line) {
-	if (line.length == 0) {
+	ArrayList<String> dataToAdd = new ArrayList<String>();
+
+	if (line.length == 0) 
 	    return;
-	} else if (line.length == 1) {
-	    System.out.println(line[0]);
+
+	if (line.length == 1 || line[0].equals("-")) {
+	    dataToAdd.add(line[0]);
+	    incomeStatement.add(dataToAdd);
 	    return;
 	}
 	
 	String combine = "";
-	
+	boolean printAgain = true;
+
 	for (int i = 0; i < line.length; i++) {
 	    if (line[i].isEmpty())
 		continue;
  	    
-	    if (Character.isAlphabetic(line[i].charAt(0))) 
-		combine += line[i] + " ";
-	    
-	    if (Character.isDigit(line[i].charAt(0))) {
-		System.out.println(line[i]);
+	    if (Character.isAlphabetic(line[i].charAt(0))) {
+		if (line[i].equals("Add")) {
+		    return;
+		}
+
+		combine += line[i] + " " ;
 	    }
 	    
-	} 
+	    if (Character.isDigit(line[i].charAt(0))) {
+		if (printAgain == true) {
+		    dataToAdd.add(combine);
+		    dataToAdd.add(line[i]);
+		    printAgain = false;
+		} else {
+		    dataToAdd.add(line[i]);
+		}    
+	    }
+
+	    if (i == line.length-1 && Character.isAlphabetic(line[i].charAt(0)))
+		dataToAdd.add(combine);
+
+	} // end for
+	
+	incomeStatement.add(dataToAdd);
     }
     
     /**
@@ -351,5 +373,18 @@ public class FinancialsExtractor {
 		(";", "");
 	}
 	return lineToModify.trim();
+    }
+
+    private void printBS() {
+	
+	for (int i = 0; i < incomeStatement.size(); i++) {
+	    for (int j = 0; j < incomeStatement.get(i).size(); j++) {
+		System.out.print(incomeStatement.get(i).get(j)+ " ");
+		
+	    } if (i != incomeStatement.size() -1 &&
+		  Character.isAlphabetic(incomeStatement.get(i+1).get(0).charAt(0)))
+		  System.out.println();
+	}
+	
     }
 }
