@@ -171,7 +171,7 @@ public class FinancialsExtractor {
 		    if (startIncrement == true)
 			i++;
 		} // end while
-			printIS();
+	       	//printIS();
 	    } catch (IOException e) {
 		System.out.println("Failed to read from income statement URL");
 		e.printStackTrace();
@@ -230,7 +230,7 @@ public class FinancialsExtractor {
 		    if (startIncrement == true)
 			i++;
 		} // end while
-		printBS();
+		//printBS();
 	    } catch (IOException e) {
 		System.out.println("Failed to read from balance sheet URL");
 		e.printStackTrace();
@@ -327,22 +327,39 @@ public class FinancialsExtractor {
 	
 	String combine = "";
 	boolean printAgain = true;
+	boolean numeric = false;
 
 	for (int i = 0; i < line.length; i++) {
-	    if (line[i].isEmpty())
+	    if (line[i].isEmpty()) {
 		continue;
+	    }
  	    
 	    if (Character.isAlphabetic(line[i].charAt(0))) {
 		if (line[i].equals("Add")) {
 		    return;
 		}
 
+		if (printAgain == false && numeric == true) {
+		    printAgain = true;
+		    numeric = false;
+		}
+		
 		combine += line[i] + " " ;
+		
+		if (checkIfHeader(combine) == true) {
+		    dataToAdd.add(combine);
+		    combine = "";
+	        }
+		
+	   
 	    }
 	    
-	    if (Character.isDigit(line[i].charAt(0))) {
+	    if (Character.isDigit(line[i].charAt(0)) ||
+		Character.isDigit(line[i].charAt(1))) {
+		numeric = true;
 		if (printAgain == true) {
 		    dataToAdd.add(combine);
+		    combine = "";
 		    dataToAdd.add(line[i]);
 		    printAgain = false;
 		} else {
@@ -391,15 +408,28 @@ public class FinancialsExtractor {
 	return lineToModify.trim();
     }
 
+    private boolean checkIfHeader(String currentHeaderWord) {
+	String[] headerWords = {"Assets", "Liabilities", "Stockholders' Equity",
+				"Operating Activities, Cash Flows Provided By or Used In",
+	                        "Investing Activities, Cash Flows Provided By or Used In",
+	                        "Financing Activities, Cash Flows Provided By or Used In"};
+	for (int i = 0; i < headerWords.length; i++) {
+	    if (currentHeaderWord.trim().equals(headerWords[i])) {
+		return true;
+	    }
+	} return false;
+    }
+
     private void printIS() {
 	System.out.println("-----\t INCOME STATEMENT \t -----");
 	for (int i = 0; i < incomeStatement.size(); i++) {
 	    for (int j = 0; j < incomeStatement.get(i).size(); j++) {
+		if (Character.isAlphabetic(incomeStatement.get(i).get(j).charAt(0))) {
+		    System.out.println();
+		}
 		System.out.print(incomeStatement.get(i).get(j)+ " ");
 		
-	    } if (i != incomeStatement.size() -1 &&
-		  Character.isAlphabetic(incomeStatement.get(i+1).get(0).charAt(0)))
-		  System.out.println();
+	    } 
 	}	
     }
 
@@ -407,11 +437,14 @@ public class FinancialsExtractor {
 	System.out.println("-----\t BALANCE SHEET \t -----");
 	for (int i = 0; i < balanceSheet.size(); i++) {
 	    for (int j = 0; j < balanceSheet.get(i).size(); j++) {
+		if (Character.isAlphabetic(balanceSheet.get(i).get(j).charAt(0))) {
+			System.out.println();
+		    }
 		System.out.print(balanceSheet.get(i).get(j)+ " ");
 		
-	    } if (i != balanceSheet.size() -1 &&
+	    } /*if (i != balanceSheet.size() -1 &&
 		  Character.isAlphabetic(balanceSheet.get(i+1).get(0).charAt(0)))
-		  System.out.println();
+		  System.out.println("\n ");*/
 	}	
     }
 
@@ -419,11 +452,12 @@ public class FinancialsExtractor {
 	System.out.println("-----\t CF STATEMENT \t -----");
 	for (int i = 0; i < cashFlowsStatement.size(); i++) {
 	    for (int j = 0; j < cashFlowsStatement.get(i).size(); j++) {
+		if (Character.isAlphabetic(cashFlowsStatement.get(i).get(j).charAt(0))) {
+		    System.out.println();
+		}
 		System.out.print(cashFlowsStatement.get(i).get(j)+ " ");
 		
-	    } if (i != cashFlowsStatement.size() -1 &&
-		  Character.isAlphabetic(cashFlowsStatement.get(i+1).get(0).charAt(0)))
-		  System.out.println();
+	    }
 	}	
     }
 }
