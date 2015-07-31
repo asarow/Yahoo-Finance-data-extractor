@@ -17,9 +17,12 @@ import java.util.List;
  * @author Amandeep Sarow
  */
 public class FinancialsExtractor {
-    private  ArrayList<ArrayList<String>> incomeStatement = new ArrayList<ArrayList<String>>();
-    private  ArrayList<ArrayList<String>> balanceSheet = new ArrayList<ArrayList<String>>();
-    private  ArrayList<ArrayList<String>> cashFlowsStatement = new ArrayList<ArrayList<String>>();
+    private ArrayList<ArrayList<String>> incomeStatement = new ArrayList
+	<ArrayList<String>>();
+    private ArrayList<ArrayList<String>> balanceSheet = new ArrayList
+	<ArrayList<String>>();
+    private ArrayList<ArrayList<String>> cashFlowsStatement = new 
+	ArrayList<ArrayList<String>>();
     private  String yahooAPIFinancialBegin = "https://query.yahooapis.com/v1/"
         + "public/yql?q=SELECT%20*%20FROM%20yahoo.finance.";
     private  String yahooAPIFinancialMid = "%20WHERE%20symbol%3D'";
@@ -171,7 +174,6 @@ public class FinancialsExtractor {
 		    if (startIncrement == true)
 			i++;
 		} // end while
-	       	printIS();
 	    } catch (IOException e) {
 		System.out.println("Failed to read from income statement URL");
 		e.printStackTrace();
@@ -230,7 +232,6 @@ public class FinancialsExtractor {
 		    if (startIncrement == true)
 			i++;
 		} // end while
-		printBS();
 	    } catch (IOException e) {
 		System.out.println("Failed to read from balance sheet URL");
 		e.printStackTrace();
@@ -289,7 +290,6 @@ public class FinancialsExtractor {
 		    if (startIncrement == true)
 			i++;
 		} // end while
-		printCF();
 	    } catch (IOException e) {
 		System.out.println("Failed to read from cash flows URL");
 		e.printStackTrace();
@@ -443,9 +443,10 @@ public class FinancialsExtractor {
 
     private boolean checkIfHeader(String currentHeaderWord) {
 	String[] headerWords = {"Assets", "Liabilities", "Stockholders' Equity",
-				"Operating Activities, Cash Flows Provided By or Used In",
-	                        "Investing Activities, Cash Flows Provided By or Used In",
-	                        "Financing Activities, Cash Flows Provided By or Used In"};
+		 "Operating Activities, Cash Flows Provided By or Used In",
+	         "Investing Activities, Cash Flows Provided By or Used In",
+	          "Financing Activities, Cash Flows Provided By or Used In"};
+	
 	for (int i = 0; i < headerWords.length; i++) {
 	    if (currentHeaderWord.trim().equals(headerWords[i])) {
 		return true;
@@ -453,44 +454,5 @@ public class FinancialsExtractor {
 	} return false;
     }
 
-    private void printIS() {
-	System.out.println("-----\t INCOME STATEMENT \t -----");
-	for (int i = 0; i < incomeStatement.size(); i++) {
-	    for (int j = 0; j < incomeStatement.get(i).size(); j++) {
-		if (i > 0 && Character.isAlphabetic(incomeStatement.get(i).get(j).charAt(0))) {
-		    System.out.println();
-		}
-		System.out.print(incomeStatement.get(i).get(j)+ " ");
-		
-	    } 
-	}	
-    }
 
-    private void printBS() {
-	System.out.println("-----\t BALANCE SHEET \t -----");
-	for (int i = 0; i < balanceSheet.size(); i++) {
-	    for (int j = 0; j < balanceSheet.get(i).size(); j++) {
-		if (i > 0 && Character.isAlphabetic(balanceSheet.get(i).get(j).charAt(0))) {
-			System.out.println();
-		    }
-		System.out.print(balanceSheet.get(i).get(j)+ " ");
-		
-	    } /*if (i != balanceSheet.size() -1 &&
-		  Character.isAlphabetic(balanceSheet.get(i+1).get(0).charAt(0)))
-		  System.out.println("\n ");*/
-	}	
-    }
-
-    private void printCF() {
-	System.out.println("-----\t CF STATEMENT \t -----");
-	for (int i = 0; i < cashFlowsStatement.size(); i++) {
-	    for (int j = 0; j < cashFlowsStatement.get(i).size(); j++) {
-		if ( i > 0 && Character.isAlphabetic(cashFlowsStatement.get(i).get(j).charAt(0))) {
-		    System.out.println();
-		}
-		System.out.print(cashFlowsStatement.get(i).get(j)+ " ");
-		
-	    }
-	}	
-    }
 }
