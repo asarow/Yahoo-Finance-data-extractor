@@ -52,6 +52,8 @@ public class StockModelViewController {
 	    balanceSheet = financials.getBalanceSheet();
 	    cashFlowsStatement = financials.getCashFlowsStatement();
 
+	    if (gui.isFrameActive() == true)
+		gui.closeRunningFrame();
 	    gui.displayFinancialStatementsData(incomeStatement, balanceSheet,
 					       cashFlowsStatement);
 	}
