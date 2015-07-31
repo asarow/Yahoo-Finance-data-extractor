@@ -33,7 +33,8 @@ public class FinancialsExtractor {
     private final String[] urlModifier = {bs, is, cf};
     private String ticker;
 	
-    public FinancialsExtractor() {	
+    public FinancialsExtractor() {
+  
     }
     
     /**
@@ -50,6 +51,10 @@ public class FinancialsExtractor {
 	BufferedReader br;
 	String line;
 	
+	incomeStatement.clear();
+	balanceSheet.clear();
+	cashFlowsStatement.clear();
+
 	for (int i = 0; i <  urlModifier.length; i++) {
 	    try {
 		url = new URL(yahooAPIFinancialBegin + urlModifier[i] + 
