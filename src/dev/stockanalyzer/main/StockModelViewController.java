@@ -1,5 +1,7 @@
 package dev.stockanalyzer.main;
 
+import java.util.*;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -42,6 +44,16 @@ public class StockModelViewController {
 	public void actionPerformed(ActionEvent arg0) {
 	    String stockTicker = gui.getTicker();
 	    financials.pullFinancialData(stockTicker);
+	    ArrayList<ArrayList<String>> incomeStatement;
+	    ArrayList<ArrayList<String>> balanceSheet;
+	    ArrayList<ArrayList<String>> cashFlowsStatement;
+
+	    incomeStatement = financials.getIncomeStatement();
+	    balanceSheet = financials.getBalanceSheet();
+	    cashFlowsStatement = financials.getCashFlowsStatement();
+
+	    gui.displayFinancialStatementsData(incomeStatement, balanceSheet,
+					       cashFlowsStatement);
 	}
     }
     
