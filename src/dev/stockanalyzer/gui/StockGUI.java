@@ -109,6 +109,9 @@ public class StockGUI extends JFrame {
 	backgroundFrame.setVisible(true);
        	backgroundFrame.setLocation(bgX, bgY);
 
+	/* Trim */
+	//ignore
+
 	displayIncomeStatement(is);
 	displayBalanceSheet(bs);
 	displayCashFlows(cf);
@@ -198,6 +201,13 @@ public class StockGUI extends JFrame {
     }
 
     private void displayIncomeStatement(ArrayList<ArrayList<String>> is) {
+	for (int i = 0; i < is.size(); i++) {
+	    for (int j = 0; j < is.get(i).size(); j++) {
+		if (is.get(i).get(j).isEmpty())
+		    is.get(i).remove(j);
+	    }
+	}
+	
 	int counter = 0;
 	for (int i = 0; i < is.size(); i++) {
 	    for (int j = 0; j < is.get(i).size(); j++) {
@@ -217,6 +227,13 @@ public class StockGUI extends JFrame {
     }
 
     private void displayBalanceSheet(ArrayList<ArrayList<String>> bs) {
+	for (int i = 0; i < bs.size(); i++) {
+	    for (int j = 0; j < bs.get(i).size(); j++) {
+		if (bs.get(i).get(j).isEmpty()) 
+		    bs.get(i).remove(j);
+	    }
+	}
+
 	int counter = 0;
 	for (int i = 0; i < bs.size(); i++) {
 	    for (int j = 0; j < bs.get(i).size(); j++) {
@@ -236,6 +253,13 @@ public class StockGUI extends JFrame {
     }
 
     private void displayCashFlows(ArrayList<ArrayList<String>> cf) {
+	for (int i = 0; i < cf.size(); i++) {
+	    for (int j = 0; j < cf.get(i).size(); j++) {
+		if (cf.get(i).get(j).isEmpty())
+		    cf.get(i).remove(j);
+	    }
+	}
+
 	int counter = 0;
 	for (int i = 0; i < cf.size(); i++) {
 	    for (int j = 0; j < cf.get(i).size(); j++) {
