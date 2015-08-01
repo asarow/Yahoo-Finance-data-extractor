@@ -32,6 +32,7 @@ public class FinancialsExtractor {
 	cf = "cashflow";
     private final String[] urlModifier = {bs, is, cf};
     private String ticker;
+    private boolean print = false;
 	
     public FinancialsExtractor() {
   
@@ -351,16 +352,24 @@ public class FinancialsExtractor {
 			    }
 			    
 			    if (periodEnding == true && !line[j].isEmpty() 
-				&& (line[j].length() == 3 || line[j].length() == 4)) {
-				counter++;
-				period += line[j] + " ";
+				&& (line[j].length() == 3 || 
+				    line[j].length() == 4)) 
+				{
+				    counter++;
+				    period += line[j] + " ";
 				
-				if (counter == 3) {
-				    dataToAdd.add(period);
-				    counter = 0;
-				    period = "";
-				}	
-			    }//  end period ending if-block
+				    if (counter == 3) {
+					dataToAdd.add(period);
+					counter = 0;
+					period = "";
+				    }	
+				}//  end period ending if-block
+
+			    if (j == line.length-1 && statementType.equals(bs))
+				{
+				    dataToAdd.add("Assets");
+				    dataToAdd.add("Current Assets");
+				}
 			} // end inner for-loop	
 			
 			if (statementType.equals(is)) {
@@ -394,6 +403,7 @@ public class FinancialsExtractor {
 	    
 	    if (Character.isDigit(line[i].charAt(0)) ||
 		Character.isDigit(line[i].charAt(1))) {
+
 		numeric = true;
 		if (printAgain == true) {
 		    dataToAdd.add(combine);
