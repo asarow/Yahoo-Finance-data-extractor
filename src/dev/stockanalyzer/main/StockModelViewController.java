@@ -43,7 +43,14 @@ public class StockModelViewController {
     class FinancialDataButtonListener implements ActionListener {
 	public void actionPerformed(ActionEvent arg0) {
 	    String stockTicker = gui.getTicker();
-	    financials.pullFinancialData(stockTicker);
+	    String statementPeriod = gui.getSelectedButton();
+
+	    if (gui.isFrameActive() == true)
+		gui.closeRunningFrame();
+
+	    gui.loadBackgroundFrame(statementPeriod);
+	    
+	    financials.pullFinancialData(stockTicker, statementPeriod);
 	    ArrayList<ArrayList<String>> incomeStatement;
 	    ArrayList<ArrayList<String>> balanceSheet;
 	    ArrayList<ArrayList<String>> cashFlowsStatement;
@@ -52,15 +59,8 @@ public class StockModelViewController {
 	    balanceSheet = financials.getBalanceSheet();
 	    cashFlowsStatement = financials.getCashFlowsStatement();
 
-	    if (gui.isFrameActive() == true)
-		gui.closeRunningFrame();
 	    gui.displayFinancialStatementsData(incomeStatement, balanceSheet,
 					       cashFlowsStatement);
 	}
-    }
-    
-	
-	
-	
-	
+    }	
 }
