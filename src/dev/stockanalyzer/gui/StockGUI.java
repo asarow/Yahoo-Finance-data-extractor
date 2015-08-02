@@ -12,6 +12,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.JRadioButton;
+import javax.swing.ButtonGroup;
 
 import java.util.*;
 
@@ -31,14 +33,16 @@ public class StockGUI extends JFrame {
     private JPanel isPanel, bsPanel, cfPanel;
     private JTextField tickerField = new JTextField("AAPL", 4);
     private JTabbedPane pane;
+    private JRadioButton annual, quarter;
     private JButton tickerButton, buildFinancialsButton;
     private JLabel[] stockLabels = new JLabel[DataExtractor.getDataSize()*2];
     private JLabel[] isLabels = new JLabel[150];
     private JLabel[] bsLabels = new JLabel[200];
     private JLabel[] cfLabels = new JLabel[150];
+    private int numOfPeriods = 4;
     private boolean activeFrame = false;
     private JFrame backgroundFrame;
-    private final int bgX = 800, bgY = 300;
+    private final int x = 450, y = 300, bgX = 850, bgY = 300;
     private final String[] headers = {"Operating Expenses", 
 				      "Income from Continuing Operations",
 				      "Non-recurring Events", "Assets", 
@@ -54,8 +58,8 @@ public class StockGUI extends JFrame {
     /** Public constructor for creation of the GUI */
     public StockGUI() {		
 	setTitle("Yahoo! Finance Data Extractor");
-	setSize(300,300);
-	setLocation(500,300);
+	setSize(x, y);
+	setLocation(400,300);
 	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	setVisible(true);
 	
@@ -66,7 +70,7 @@ public class StockGUI extends JFrame {
 	addCenterComponents();
 	addSouthComponents();
 
-	loadBackgroundFrame();
+	//loadBackgroundFrame();
     }
     
     /** 
@@ -105,7 +109,15 @@ public class StockGUI extends JFrame {
 	(ArrayList<ArrayList<String>> is, ArrayList<ArrayList<String>> bs, 
 	 ArrayList<ArrayList<String>> cf) 
     {
+
+	if (getSelectedButton().equals("annual")) {
+	    numOfPeriods = 3;
+	} else if (getSelectedButton().equals("quarterly")) {
+	    numOfPeriods = 4;
+	}
+
 	activeFrame = true;
+
 	backgroundFrame.setVisible(true);
        	backgroundFrame.setLocation(bgX, bgY);
 
@@ -141,16 +153,33 @@ public class StockGUI extends JFrame {
     public void getFinancialData(ActionListener financialButtonListener) {
 	buildFinancialsButton.addActionListener(financialButtonListener);
     }
+
+    public String getSelectedButton() {
+	if (annual.isSelected()) {
+	    return "annual";
+	} else {
+	    return "quarterly";
+	}
+    }
     
     /* Begin private methods */
 
     /** Adds GUI elements to the north JPanel bar */
     private void addNorthComponents() {
+	ButtonGroup group = new ButtonGroup();
+	annual = new JRadioButton("Annual");
+	quarter = new JRadioButton("Quarter");
 	tickerButton = new JButton("Go!");
 	buildFinancialsButton = new JButton("Build financials");
 	northPanel.add(tickerField);
 	northPanel.add(tickerButton);
 	northPanel.add(buildFinancialsButton);
+	group.add(annual);
+	group.add(quarter);
+	northPanel.add(annual);
+	northPanel.add(quarter);
+	annual.setSelected(true);
+	
     }
     
     /** Adds GUI elements to the center panel. */
@@ -168,7 +197,7 @@ public class StockGUI extends JFrame {
 	southPanel.add(new JLabel("Test"));
     }
 
-    private void loadBackgroundFrame() {
+    public void loadBackgroundFrame(String periodType) {
         backgroundFrame = new JFrame("Financial Statements");
 	backgroundFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         backgroundFrame.setSize(1000,600);
@@ -176,17 +205,23 @@ public class StockGUI extends JFrame {
 
 	pane = new JTabbedPane();
 
-	backgroundFrame.add(pane);
+	if (periodType.equals("annual")) {
+	    numOfPeriods = 3;
+	} else if (periodType.equals("quarterly")) {
+	    numOfPeriods = 4;
+	}
+	/* Initialize labels for each type of statement */
 
-	isPanel = new JPanel(new GridLayout(0, 5));
-	bsPanel = new JPanel(new GridLayout(0, 5));
-	cfPanel = new JPanel(new GridLayout(0, 5));
+	isPanel = new JPanel(new GridLayout(0, numOfPeriods+1));
+	bsPanel = new JPanel(new GridLayout(0, numOfPeriods+1));
+	cfPanel = new JPanel(new GridLayout(0, numOfPeriods+1));
+
 	pane.addTab("Income Statement", null, isPanel);
 	pane.addTab("Balance Sheet", null, bsPanel);
 	pane.addTab("Cash Flows", null, cfPanel);
 
-	/* Initialize labels for each type of statement */
-
+	backgroundFrame.add(pane);
+	
         for (int i = 0; i < isLabels.length; i++) {
 	    isPanel.add(isLabels[i] = new JLabel());
 	}
@@ -214,7 +249,7 @@ public class StockGUI extends JFrame {
 		String label = is.get(i).get(j);
 		for (int k = 0; k < headers.length; k++) {
 		    if (label.trim().equals(headers[k])) {
-			for (int l = 0; l < 4; l++) {
+			for (int l = 0; l < numOfPeriods; l++) {
 			    is.get(i).add(j+1, " ");
 			}
 		    }
@@ -240,7 +275,7 @@ public class StockGUI extends JFrame {
 		String label = bs.get(i).get(j);
 		for (int k = 0; k < headers.length; k++) {
 		    if (label.trim().equals(headers[k])) {
-			for (int l = 0; l < 4; l++) {
+			for (int l = 0; l < numOfPeriods; l++) {
 			    bs.get(i).add(j+1, " ");
 			}
 		    }
@@ -266,7 +301,7 @@ public class StockGUI extends JFrame {
 		String label = cf.get(i).get(j);
 		for (int k = 0; k < headers.length; k++) {
 		    if (label.trim().equals(headers[k])) {
-			for (int l = 0; l < 4; l++) {
+			for (int l = 0; l < numOfPeriods; l++) {
 			    cf.get(i).add(j+1, " ");
 			}
 		    }
