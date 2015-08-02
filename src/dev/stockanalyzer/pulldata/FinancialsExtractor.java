@@ -31,7 +31,7 @@ public class FinancialsExtractor {
     private final String bs = "balancesheet", is = "incomestatement", 
 	cf = "cashflow";
     private final String[] urlModifier = {bs, is, cf};
-    private String ticker;
+    private String ticker, periodType;
     private boolean print = false;
 	
     public FinancialsExtractor() {
@@ -45,8 +45,9 @@ public class FinancialsExtractor {
      * 
      * @param ticker the stock ticker input by the user.
      */
-    public void pullFinancialData(String ticker) {
+    public void pullFinancialData(String ticker, String periodType) {
 	this.ticker = ticker; //TODO: Change
+	this.periodType = periodType;
 	URL url;
 	InputStream istream = null;
 	BufferedReader br;
@@ -148,6 +149,11 @@ public class FinancialsExtractor {
 	boolean startScraping = false;
 	boolean startIncrement = false;
 	int i = 0;
+
+	if (periodType.equals("annual")) {
+	    incomeStatementURL = incomeStatementURL.replace("quarterly",
+							    "annual");
+	}
 	
 	try {
 	    url = new URL(incomeStatementURL);
@@ -161,8 +167,11 @@ public class FinancialsExtractor {
 	    br = new BufferedReader(new InputStreamReader(istream));
 	    
 	    try {
-		while((line = br.readLine())!= null && i != 17) {
+		while((line = br.readLine())!= null && 
+		      (periodType.equals("quarterly") && i != 17) ||
+		      (periodType.equals("annual") && i != 14)) {
 		    /* Start scraping the HTML at this point */ 
+
 		    if (line.contains("Period Ending")) 
 			startScraping = true;
 		    
@@ -209,6 +218,10 @@ public class FinancialsExtractor {
 	boolean startScraping = false;
 	boolean startIncrement = false;
 	int i = 0;
+
+	if (periodType.equals("annual")) {
+	    balanceSheetURL = balanceSheetURL.replace("quarterly", "annual");
+	}
 	
 	try {
 	    url = new URL(balanceSheetURL);
@@ -222,7 +235,10 @@ public class FinancialsExtractor {
 	    br = new BufferedReader(new InputStreamReader(istream));
 	    
 	    try {
-		while((line = br.readLine())!= null && i != 17) {
+		while((line = br.readLine())!= null && 
+		      (periodType.equals("quarterly") && i != 17) ||
+		      (periodType.equals("annual") && i != 14)) {
+
 		    if (line.contains("Period Ending")) 
 			startScraping = true;
 		    
@@ -268,6 +284,10 @@ public class FinancialsExtractor {
 	boolean startIncrement = false;
 	int i = 0;
 	
+	if (periodType.equals("annual")) {
+	    cashFlowURL = cashFlowURL.replace("quarterly", "annual");
+	}
+
 	try {
 	    url = new URL(cashFlowURL);
 	    try {
@@ -280,7 +300,9 @@ public class FinancialsExtractor {
 	    br = new BufferedReader(new InputStreamReader(istream));
 	    
 	    try {
-		while((line = br.readLine())!= null && i != 17) {
+		while((line = br.readLine())!= null &&
+		      (periodType.equals("quarterly") && i != 17) ||
+		      (periodType.equals("annual") && i != 14)) {
 		    if (line.contains("Period Ending")) 
 			startScraping = true;
 		    
@@ -315,7 +337,7 @@ public class FinancialsExtractor {
      */
     private void buildSheet(String[] line, String statementType) {
 	ArrayList<String> dataToAdd = new ArrayList<String>();
-
+	
 	if (line.length == 0) 
 	    return;
 
@@ -400,7 +422,7 @@ public class FinancialsExtractor {
 		
 	   
 	    }// end main IF
-	    
+
 	    if (Character.isDigit(line[i].charAt(0)) ||
 		Character.isDigit(line[i].charAt(1))) {
 
