@@ -20,6 +20,7 @@ public class StockModelViewController {
     private DataExtractor extractor;
     private StockGUI gui;
     private FinancialsExtractor financials;
+    private String savePath;
 
     StockModelViewController(DataExtractor extractor, StockGUI gui, 
 			     FinancialsExtractor financials) {
@@ -29,6 +30,7 @@ public class StockModelViewController {
 	
 	this.gui.getStockData(new StockButtonListener());
 	this.gui.getFinancialData(new FinancialDataButtonListener());
+	this.gui.findSavePath(new FileButtonListener());
     }
      
     class StockButtonListener implements ActionListener {
@@ -63,4 +65,11 @@ public class StockModelViewController {
 					       cashFlowsStatement);
 	}
     }	
+
+    class FileButtonListener implements ActionListener {
+	public void actionPerformed(ActionEvent arg0) {
+	    savePath = gui.storeSavePath();
+	    System.out.println(savePath);
+	}
+    }
 }
