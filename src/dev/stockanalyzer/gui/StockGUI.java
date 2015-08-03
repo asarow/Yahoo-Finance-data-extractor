@@ -3,6 +3,7 @@ package dev.stockanalyzer.gui;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JButton;
@@ -14,8 +15,11 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
+import javax.swing.JFileChooser;
 
 import java.util.*;
+
+import java.io.*;
 
 import dev.stockanalyzer.pulldata.DataExtractor;
 
@@ -30,18 +34,21 @@ public class StockGUI extends JFrame {
     private JPanel centerPanel = new JPanel(new GridLayout(DataExtractor
 							   .getDataSize(), 1));
     private JPanel southPanel = new JPanel();
+    private JPanel eastPanel = new JPanel();
     private JPanel isPanel, bsPanel, cfPanel;
     private JTextField tickerField = new JTextField("AAPL", 4);
     private JTabbedPane pane;
     private JRadioButton annual, quarter;
-    private JButton tickerButton, buildFinancialsButton;
+    private JButton tickerButton, buildFinancialsButton, exportButton, 
+	            fileButton;
     private JLabel[] stockLabels = new JLabel[DataExtractor.getDataSize()*2];
     private JLabel[] isLabels = new JLabel[150];
     private JLabel[] bsLabels = new JLabel[200];
     private JLabel[] cfLabels = new JLabel[150];
+    private JFrame backgroundFrame;
+    private File file;
     private int numOfPeriods = 4;
     private boolean activeFrame = false;
-    private JFrame backgroundFrame;
     private final int x = 450, y = 300, bgX = 850, bgY = 300;
     private final String[] headers = {"Operating Expenses", 
 				      "Income from Continuing Operations",
@@ -65,12 +72,10 @@ public class StockGUI extends JFrame {
 	
 	add(northPanel, BorderLayout.NORTH);
 	add(centerPanel);
-	add(southPanel, BorderLayout.SOUTH);
+	add(eastPanel, BorderLayout.EAST);
 	addNorthComponents();
 	addCenterComponents();
-	addSouthComponents();
-
-	//loadBackgroundFrame();
+	addEastComponents();
     }
     
     /** 
@@ -109,7 +114,7 @@ public class StockGUI extends JFrame {
 	(ArrayList<ArrayList<String>> is, ArrayList<ArrayList<String>> bs, 
 	 ArrayList<ArrayList<String>> cf) 
     {
-
+	
 	if (getSelectedButton().equals("annual")) {
 	    numOfPeriods = 3;
 	} else if (getSelectedButton().equals("quarterly")) {
@@ -120,14 +125,12 @@ public class StockGUI extends JFrame {
 
 	backgroundFrame.setVisible(true);
        	backgroundFrame.setLocation(bgX, bgY);
-
-	/* Trim */
-	//ignore
+	fileButton.setEnabled(true);
+	exportButton.setEnabled(true);
 
 	displayIncomeStatement(is);
 	displayBalanceSheet(bs);
 	displayCashFlows(cf);
-
     }
     
     /** 
@@ -154,6 +157,23 @@ public class StockGUI extends JFrame {
 	buildFinancialsButton.addActionListener(financialButtonListener);
     }
 
+    public void findSavePath(ActionListener fileButtonListener) {
+	fileButton.addActionListener(fileButtonListener);
+    }
+
+    public String storeSavePath() {
+	JFileChooser chooser = new JFileChooser(); 
+	chooser.setSelectedFile(new File(getTicker() + ".xls"));
+	int returnVal = chooser.showSaveDialog(this);
+	if (returnVal == JFileChooser.APPROVE_OPTION) {
+	    return chooser.getSelectedFile().getAbsolutePath();
+	} else {
+	    System.out.println("Failed selecting a save path");
+	    return null;
+	}
+	
+    }
+    
     public String getSelectedButton() {
 	if (annual.isSelected()) {
 	    return "annual";
@@ -162,41 +182,6 @@ public class StockGUI extends JFrame {
 	}
     }
     
-    /* Begin private methods */
-
-    /** Adds GUI elements to the north JPanel bar */
-    private void addNorthComponents() {
-	ButtonGroup group = new ButtonGroup();
-	annual = new JRadioButton("Annual");
-	quarter = new JRadioButton("Quarter");
-	tickerButton = new JButton("Go!");
-	buildFinancialsButton = new JButton("Build financials");
-	northPanel.add(tickerField);
-	northPanel.add(tickerButton);
-	northPanel.add(buildFinancialsButton);
-	group.add(annual);
-	group.add(quarter);
-	northPanel.add(annual);
-	northPanel.add(quarter);
-	annual.setSelected(true);
-	
-    }
-    
-    /** Adds GUI elements to the center panel. */
-    private void addCenterComponents() {
-	String[] labels = {"Name: ", "" ,
-			   "Price: ", " ", "Change:", " " , "Market Cap:", " ",
-			   "EBITDA", " ", "PE Ratio" , " "};
-	for (int i = 0; i < stockLabels.length; i++) {
-	    centerPanel.add(stockLabels[i] = new JLabel(labels[i]));
-	}	
-    }
-    
-    /** Test panel. */
-    private void addSouthComponents() {
-	southPanel.add(new JLabel("Test"));
-    }
-
     public void loadBackgroundFrame(String periodType) {
         backgroundFrame = new JFrame("Financial Statements");
 	backgroundFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -234,6 +219,46 @@ public class StockGUI extends JFrame {
 	    cfPanel.add(cfLabels[i] = new JLabel());
 	}
     }
+
+    /* Begin private methods */
+
+    /** Adds GUI elements to the north JPanel bar */
+    private void addNorthComponents() {
+	ButtonGroup group = new ButtonGroup();
+	annual = new JRadioButton("Annual");
+	quarter = new JRadioButton("Quarter");
+	tickerButton = new JButton("Go!");
+	buildFinancialsButton = new JButton("Build financials");
+	northPanel.add(tickerField);
+	northPanel.add(tickerButton);
+	northPanel.add(buildFinancialsButton);
+	group.add(annual);
+	group.add(quarter);
+	northPanel.add(annual);
+	northPanel.add(quarter);
+	annual.setSelected(true);
+	
+    }
+    
+    /** Adds GUI elements to the center panel. */
+    private void addCenterComponents() {
+	String[] labels = {"Name: ", "" ,
+			   "Price: ", " ", "Change:", " " , "Market Cap:", " ",
+			   "EBITDA", " ", "PE Ratio" , " "};
+	for (int i = 0; i < stockLabels.length; i++) {
+	    centerPanel.add(stockLabels[i] = new JLabel(labels[i]));
+	}	
+    }
+
+    private void addEastComponents() {
+	exportButton = new JButton("Export");
+	fileButton = new JButton("Save As");
+	eastPanel.add(fileButton);
+	eastPanel.add(exportButton);
+	fileButton.setEnabled(false);
+	exportButton.setEnabled(false);
+    }
+
 
     private void displayIncomeStatement(ArrayList<ArrayList<String>> is) {
 	for (int i = 0; i < is.size(); i++) {
