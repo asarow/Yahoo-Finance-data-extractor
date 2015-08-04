@@ -195,7 +195,8 @@ public class StockGUI extends JFrame {
 
     public String storeSavePath() {
 	JFileChooser chooser = new JFileChooser(); 
-	chooser.setSelectedFile(new File(getTicker() + ".xls"));
+	chooser.setSelectedFile(new File(getTicker() + getSelectedButton() +
+					 ".xls"));
 	int returnVal = chooser.showSaveDialog(this);
 	if (returnVal == JFileChooser.APPROVE_OPTION) {
 	    return chooser.getSelectedFile().getAbsolutePath();

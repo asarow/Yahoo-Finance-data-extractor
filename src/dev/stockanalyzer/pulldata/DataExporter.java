@@ -59,7 +59,9 @@ public class DataExporter {
 	
 	// works
 	for (int i = 0; i < financialStatementsSheets.length; i++) {
-	    financialStatementsSheets[i].autoSizeColumn(0);
+	    for (int j = 0; j < columnLimit; j++) {
+		financialStatementsSheets[i].autoSizeColumn(j);
+	    }
 	}
 
 	try {

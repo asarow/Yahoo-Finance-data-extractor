@@ -238,6 +238,10 @@ public class FinancialsExtractor {
 		while((line = br.readLine())!= null && 
 		      (periodType.equals("quarterly") && i != 17) ||
 		      (periodType.equals("annual") && i != 14)) {
+		    
+		    if (line == null) {
+			System.out.println("THIS IS NULL");
+		    }
 
 		    if (line.contains("Period Ending")) 
 			startScraping = true;
