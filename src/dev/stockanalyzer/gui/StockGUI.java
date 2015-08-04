@@ -161,6 +161,38 @@ public class StockGUI extends JFrame {
 	fileButton.addActionListener(fileButtonListener);
     }
 
+    public void exportFinancialData(ActionListener exportButtonListener) {
+	exportButton.addActionListener(exportButtonListener);
+    }
+
+    public ArrayList<ArrayList<String>> getFinancialStatementsData() {
+	ArrayList<ArrayList<String>> data = new ArrayList<ArrayList<String>>();
+
+	ArrayList<String> isHolder = new ArrayList<String>();
+	ArrayList<String> bsHolder = new ArrayList<String>();
+	ArrayList<String> cfHolder = new ArrayList<String>();
+
+	data.add(isHolder);
+	data.add(bsHolder);
+	data.add(cfHolder);
+
+	for (int i = 0; i < isLabels.length; i++) {
+	    data.get(0).add(isLabels[i].getText());
+	}
+
+	for (int i = 0; i < bsLabels.length; i++) {
+	    data.get(1).add(bsLabels[i].getText());
+	}
+
+	for (int i = 0; i < cfLabels.length; i++) {
+	    data.get(2).add(cfLabels[i].getText());
+	}
+
+	return data;
+    }
+
+   
+
     public String storeSavePath() {
 	JFileChooser chooser = new JFileChooser(); 
 	chooser.setSelectedFile(new File(getTicker() + ".xls"));
@@ -171,8 +203,8 @@ public class StockGUI extends JFrame {
 	    System.out.println("Failed selecting a save path");
 	    return null;
 	}
-	
     }
+
     
     public String getSelectedButton() {
 	if (annual.isSelected()) {
