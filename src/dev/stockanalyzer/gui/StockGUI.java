@@ -64,7 +64,7 @@ public class StockGUI extends JFrame {
     
     /** Public constructor for creation of the GUI */
     public StockGUI() {		
-	setTitle("Yahoo! Finance Data Extractor");
+	setTitle("Financial Data Extractor v1.0");
 	setSize(x, y);
 	setLocation(400,300);
 	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
