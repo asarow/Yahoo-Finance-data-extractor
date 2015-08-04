@@ -11,6 +11,7 @@ import java.util.List;
 import dev.stockanalyzer.gui.StockGUI;
 import dev.stockanalyzer.pulldata.DataExtractor;
 import dev.stockanalyzer.pulldata.FinancialsExtractor;
+import dev.stockanalyzer.pulldata.DataExporter;
 
 /**
  * The main class which creates a graphical user interface object, an object
@@ -25,8 +26,9 @@ public class StockMain {
 	StockGUI gui = new StockGUI();
 	DataExtractor extractor = new DataExtractor();
 	FinancialsExtractor financials = new FinancialsExtractor();
+	DataExporter exporter = new DataExporter();
 	
 	StockModelViewController mvc = new StockModelViewController
-	    (extractor, gui, financials);	
+	    (extractor, gui, financials, exporter);	
     }
 }
