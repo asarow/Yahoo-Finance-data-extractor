@@ -46,7 +46,7 @@ public class FinancialsExtractor {
      * @param ticker the stock ticker input by the user.
      */
     public void pullFinancialData(String ticker, String periodType) {
-	this.ticker = ticker; //TODO: Change
+	this.ticker = ticker; //TODO: Change how the ticker is stored.
 	this.periodType = periodType;
 	URL url;
 	InputStream istream = null;
@@ -150,6 +150,7 @@ public class FinancialsExtractor {
 	boolean startIncrement = false;
 	int i = 0;
 
+	// The URL must be modified depending on the type of statement
 	if (periodType.equals("annual")) {
 	    incomeStatementURL = incomeStatementURL.replace("quarterly",
 							    "annual");
@@ -167,14 +168,27 @@ public class FinancialsExtractor {
 	    br = new BufferedReader(new InputStreamReader(istream));
 	    
 	    try {
+		/* All comments below apply to pullBalanceSheet() and
+		   pullCashFlows(); */
+
+		/* The BufferedReader returns each line of the HTML page.
+		   Most lines are not necessary as they do not contain
+		   any of the financial data. Lines that do contain financial
+		   data are passed to a HTML scraper. Certain checks are in
+		   place to specify when to start storing lines of HTML and
+		   when to stop. */
+
 		while((line = br.readLine())!= null && 
 		      (periodType.equals("quarterly") && i != 17) ||
 		      (periodType.equals("annual") && i != 14)) {
-		    /* Start scraping the HTML at this point */ 
 
+		    /* Start scraping the HTML at this point */ 
 		    if (line.contains("Period Ending")) 
 			startScraping = true;
 		    
+		    /* There is a fixed number of lines to be passed after
+		       this line and the startIncrement boolean variable
+		       specifies when to start counting the number of lines*/
 		    if (line.contains("Net Income Applicable To Common Shares"))
 			startIncrement = true;
 		    
@@ -186,8 +200,15 @@ public class FinancialsExtractor {
 			}
 		    }
 		    
+		    /* A counter which keeps track of how many remaining lines
+		       need to be scraped after "Net Income Applicable... 
+		       Once this counter hits either 14 or 17 depending on
+		       the financial statement type. No more lines of HTML
+		       are stored. The HTML from here on does not contain
+		       financial data */
 		    if (startIncrement == true)
 			i++;
+
 		} // end while
 	    } catch (IOException e) {
 		System.out.println("Failed to read from income statement URL");
@@ -341,10 +362,19 @@ public class FinancialsExtractor {
      */
     private void buildSheet(String[] line, String statementType) {
 	ArrayList<String> dataToAdd = new ArrayList<String>();
+
+	/* This method scrapes each line of HTML code and only stores
+	   important financial information. Since the data needs to
+	   be stored in a specific format, there are many checks in
+	   place to ensure this format is met */
 	
+	// Ignore empty lines
 	if (line.length == 0) 
 	    return;
 
+	/* Some financial data is not available and thus is represented by
+	   a small dash ("-") only. In some rare cases, only a single
+	   number is available (new public company). */
 	if (line.length == 1 || line[0].equals("-")) {
 	    dataToAdd.add(line[0]);
 	    if (statementType.equals(is)) {
@@ -357,16 +387,25 @@ public class FinancialsExtractor {
 	    return;
 	}
 	
+	/* Some important financial statement headers are split and must
+	   be recombined */
 	String combine = "";
 	boolean printAgain = true;
 	boolean numeric = false;
 
+	/* The below for statement represents line of HTML code that contains
+	   multiple financial data in a single line */
 	for (int i = 0; i < line.length; i++) {
 	    if (line[i].isEmpty()) {
 		continue;
 	    }
  	    
+	    /* If the data begins with a letter, it is likely a financial
+	       statement header */
 	    if (Character.isAlphabetic(line[i].charAt(0))) {
+
+		/* The very first line contains the dates of the financial
+		   periods which needs to be extracted carefully */
 		if (line[i].equals("Add")) {
 			boolean periodEnding = false;
 			int counter = 0;
@@ -417,8 +456,11 @@ public class FinancialsExtractor {
 		    numeric = false;
 		}
 		
+		// Combine split financial statement header words 
 		combine += line[i] + " " ;
 		
+		/* checkIfHeader() checks if the String combine matches
+		   known financial headers */
 		if (checkIfHeader(combine) == true) {
 		    dataToAdd.add(combine);
 		    combine = "";
@@ -426,7 +468,8 @@ public class FinancialsExtractor {
 		
 	   
 	    }// end main IF
-
+	    
+	    // If the financial data begins with a number
 	    if (Character.isDigit(line[i].charAt(0)) ||
 		Character.isDigit(line[i].charAt(1))) {
 
@@ -482,6 +525,11 @@ public class FinancialsExtractor {
 	return lineToModify.trim();
     }
 
+    /** 
+     * Compares known financial headers to the String parameter.
+     *
+     * @return true if there is a match, false otherwise.
+     */
     private boolean checkIfHeader(String currentHeaderWord) {
 	String[] headerWords = {"Assets", "Liabilities", "Stockholders' Equity",
 		 "Operating Activities, Cash Flows Provided By or Used In",

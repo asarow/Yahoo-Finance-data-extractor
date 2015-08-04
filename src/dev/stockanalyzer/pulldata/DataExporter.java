@@ -9,13 +9,28 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Cell;
 
-
+/**
+ * Exports financial statement information in an excel-friendly format.
+ *
+ * @author Amandeep Sarow
+ */
 public class DataExporter {
     
     public DataExporter() {
 	
     }
-
+    
+    /**
+     * Exports all three financial statements into an excel file which
+     * is then saved onto the user's computer with the provided save
+     * path.
+     *
+     * @param savePath the save path provided by the user.
+     * @param data A two-dimensional list containing all the financial 
+     *             statement information.
+     * @param statementType specifies whether the data should be annual
+     *                      or quarterly.
+     */
     public void exportData(String savePath, ArrayList<ArrayList<String>> 
 			   data, String statementType) {
 
@@ -31,39 +46,46 @@ public class DataExporter {
 	HSSFSheet[] financialStatementsSheets = {incomeStatement, balanceSheet,
 						cashFlows};
 
+	// Sets the number of columns depending on the type of statement
 	if (statementType.equals("annual")) {
 	    columnLimit = 4;
 	} else if (statementType.equals("quarterly")) {
 	    columnLimit = 5;
 	}
 
+	// For debugging purposes (time to export)
 	System.out.println("Printing...");
 	
-	int counter = 0;
+	int counter = 0; // An indexer for the rows
 	int columnCounter = 0;
 	for (int i = 0; i < data.size(); i++) {
 	    for (int j = 0; j < data.get(i).size(); j++) {
+		/* If the number of columns reaches the column limit,
+		   create a new row with an index */
 		if (j % columnLimit == 0) {
 		    columnCounter = 0;
 		    row = financialStatementsSheets[i].createRow(counter);
 		    counter++;
 		}
 		
+		// Create a cell in the specified the column index
 		cell = row.createCell(columnCounter);
 		columnCounter++;
 		cell.setCellValue(data.get(i).get(j));
 	    }
+	    // Reset for each financial statement
 	    counter = 0;
 	    columnCounter = 0;
 	}
 	
-	// works
+	// Automatically resizes the columns based on the length of data
 	for (int i = 0; i < financialStatementsSheets.length; i++) {
 	    for (int j = 0; j < columnLimit; j++) {
 		financialStatementsSheets[i].autoSizeColumn(j);
 	    }
 	}
-
+	
+	// Output the excel file to the supplied save path
 	try {
 	    fileOut = new FileOutputStream(savePath);
 	    wb.write(fileOut);

@@ -78,24 +78,7 @@ public class StockGUI extends JFrame {
 	addEastComponents();
     }
     
-    /** 
-     * Getter for the stock ticker symbol input by the user.
-     *
-     * @return the stock ticker provided as input by the user.
-     */
-    public String getTicker() {
-	return tickerField.getText();
-    }
 
-    public boolean isFrameActive() {
-	return activeFrame;
-    }
-    
-    public void closeRunningFrame() {
-	backgroundFrame.dispatchEvent(new WindowEvent(backgroundFrame, 
-				      WindowEvent.WINDOW_CLOSING));
-	activeFrame = false;
-    }
     /** 
      * Displays the stock labels and stock data. This method is called inside
      * the StockModelViewController class.
@@ -110,11 +93,17 @@ public class StockGUI extends JFrame {
 	}
     }
 
+    /**
+     * Displays the income statement, balance sheet, and statement of cash
+     * flows in a new window.
+     */
     public void displayFinancialStatementsData
 	(ArrayList<ArrayList<String>> is, ArrayList<ArrayList<String>> bs, 
 	 ArrayList<ArrayList<String>> cf) 
     {
 	
+	/* numOfPeriods represents the number of columns needed to 
+	   display the financial data. */
 	if (getSelectedButton().equals("annual")) {
 	    numOfPeriods = 3;
 	} else if (getSelectedButton().equals("quarterly")) {
@@ -125,26 +114,37 @@ public class StockGUI extends JFrame {
 
 	backgroundFrame.setVisible(true);
        	backgroundFrame.setLocation(bgX, bgY);
+
+	/* The ability to save and export is only available if the
+	   user has built the financial statements */
 	fileButton.setEnabled(true);
 	exportButton.setEnabled(true);
 
+	// Methods to display the data
 	displayIncomeStatement(is);
 	displayBalanceSheet(bs);
 	displayCashFlows(cf);
     }
-    
-    /** 
-     * Takes an ActionListener parameter from the model view controller and
-     * updates the stock data for a given stock ticker when the 'GO!' button
-     * is pressed.
+
+    /**
+     * Checks if an existing financial statement window is currently
+     * running. 
      *
-     * @param tickerButtonListener an ActionListener for the GO! button from 
-     *                              the mvc.
+     * @return true if a GUI is currently open, false otherwise.
      */
-    public void getStockData(ActionListener tickerButtonListener) {
-	tickerButton.addActionListener(tickerButtonListener);
+    public boolean isFrameActive() {
+	return activeFrame;
     }
     
+    /**
+     * Closes the existing financial statement window.
+     */
+    public void closeRunningFrame() {
+	backgroundFrame.dispatchEvent(new WindowEvent(backgroundFrame, 
+				      WindowEvent.WINDOW_CLOSING));
+	activeFrame = false;
+    }
+
     /**
      * Takes an ActionListener parameter from the model view controller and
      * updates the GUI with financial statement information for a given stock
@@ -157,17 +157,60 @@ public class StockGUI extends JFrame {
 	buildFinancialsButton.addActionListener(financialButtonListener);
     }
 
+    /**
+     * Takes an ActionListener paramter from the model view controller and
+     * stores the user-selected save path from the GUI.
+     *
+     *@param fileButtonListener an ActonListener for the Save As button 
+     *                          from the mvc.
+     */
     public void findSavePath(ActionListener fileButtonListener) {
 	fileButton.addActionListener(fileButtonListener);
     }
 
+    /**
+     * Takes an ActionListener paramter from the model view controller and
+     * stores the user-selected exports the financial data to the save path.
+     *
+     *@param exportButtonListener an ActonListener for the export button 
+     *                            from the mvc.
+     */
     public void exportFinancialData(ActionListener exportButtonListener) {
 	exportButton.addActionListener(exportButtonListener);
     }
 
+    /** 
+     * Takes an ActionListener parameter from the model view controller and
+     * updates the stock data for a given stock ticker when the 'GO!' button
+     * is pressed.
+     *
+     * @param tickerButtonListener an ActionListener for the GO! button from 
+     *                              the mvc.
+     */
+    public void getStockData(ActionListener tickerButtonListener) {
+	tickerButton.addActionListener(tickerButtonListener);
+    }
+
+    /** 
+     * Getter for the stock ticker symbol input by the user.
+     *
+     * @return the stock ticker provided as input by the user.
+     */
+    public String getTicker() {
+	return tickerField.getText();
+    }
+
+    /**
+     * Getter which retrieves the financial statement data directly from the
+     * GUI.
+     *
+     * @return data from the income statement, balance sheet, and statement
+     *         of cash flows.
+     */
     public ArrayList<ArrayList<String>> getFinancialStatementsData() {
 	ArrayList<ArrayList<String>> data = new ArrayList<ArrayList<String>>();
 
+	// empty placeholders 
 	ArrayList<String> isHolder = new ArrayList<String>();
 	ArrayList<String> bsHolder = new ArrayList<String>();
 	ArrayList<String> cfHolder = new ArrayList<String>();
@@ -188,11 +231,22 @@ public class StockGUI extends JFrame {
 	    data.get(2).add(cfLabels[i].getText());
 	}
 
+	/* Since the data has been slightly modified for viewing purposes
+	   (i.e. a new line after each financial statement header), for 
+	   exporting to excel, the structure of the data needs to be
+	   consistent which is why the data is retrieved from the GUI
+	   instead of the FinancialsExtractor class which contains the
+	   raw data for the financial statements */
+
 	return data;
     }
-
-   
-
+    
+    /**
+     * Allows the user to select a save-path for exporting financial 
+     * statements. This method is called by the model view controller.
+     *
+     * @return a String representing the save-path.
+     */
     public String storeSavePath() {
 	JFileChooser chooser = new JFileChooser(); 
 	chooser.setSelectedFile(new File(getTicker() + getSelectedButton() +
@@ -206,7 +260,11 @@ public class StockGUI extends JFrame {
 	}
     }
 
-    
+    /**
+     * Returns the type of financial statement option selected.
+     *
+     * @return the type of financial statement (quarterly or annual).
+     */
     public String getSelectedButton() {
 	if (annual.isSelected()) {
 	    return "annual";
@@ -215,6 +273,10 @@ public class StockGUI extends JFrame {
 	}
     }
     
+    /**
+     * Builds the GUI for the financial statements each time the user
+     * chooses to.
+     */
     public void loadBackgroundFrame(String periodType) {
         backgroundFrame = new JFrame("Financial Statements");
 	backgroundFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -228,8 +290,9 @@ public class StockGUI extends JFrame {
 	} else if (periodType.equals("quarterly")) {
 	    numOfPeriods = 4;
 	}
-	/* Initialize labels for each type of statement */
 
+	/* The number of columns is dependent on the type of 
+	   financial statement (quarterly or annual) */
 	isPanel = new JPanel(new GridLayout(0, numOfPeriods+1));
 	bsPanel = new JPanel(new GridLayout(0, numOfPeriods+1));
 	cfPanel = new JPanel(new GridLayout(0, numOfPeriods+1));
@@ -240,6 +303,8 @@ public class StockGUI extends JFrame {
 
 	backgroundFrame.add(pane);
 	
+	/* Initialize labels for each type of statement */
+
         for (int i = 0; i < isLabels.length; i++) {
 	    isPanel.add(isLabels[i] = new JLabel());
 	}
@@ -283,6 +348,7 @@ public class StockGUI extends JFrame {
 	}	
     }
 
+    /** Adds GUI elements to the east panel */
     private void addEastComponents() {
 	exportButton = new JButton("Export");
 	fileButton = new JButton("Save As");
@@ -292,8 +358,9 @@ public class StockGUI extends JFrame {
 	exportButton.setEnabled(false);
     }
 
-
+    /** Updates the GUI with income statement data */
     private void displayIncomeStatement(ArrayList<ArrayList<String>> is) {
+	// Remove any empty Strings
 	for (int i = 0; i < is.size(); i++) {
 	    for (int j = 0; j < is.get(i).size(); j++) {
 		if (is.get(i).get(j).isEmpty())
@@ -308,6 +375,7 @@ public class StockGUI extends JFrame {
 		for (int k = 0; k < headers.length; k++) {
 		    if (label.trim().equals(headers[k])) {
 			for (int l = 0; l < numOfPeriods; l++) {
+			    // Set the labels to empty for each header
 			    is.get(i).add(j+1, " ");
 			}
 		    }
@@ -319,6 +387,7 @@ public class StockGUI extends JFrame {
 	}
     }
 
+    /** Updates the GUI with balance sheet data */
     private void displayBalanceSheet(ArrayList<ArrayList<String>> bs) {
 	for (int i = 0; i < bs.size(); i++) {
 	    for (int j = 0; j < bs.get(i).size(); j++) {
@@ -345,6 +414,7 @@ public class StockGUI extends JFrame {
 	}
     }
 
+    /** Updates the GUI with cash flow data */
     private void displayCashFlows(ArrayList<ArrayList<String>> cf) {
 	for (int i = 0; i < cf.size(); i++) {
 	    for (int j = 0; j < cf.get(i).size(); j++) {
