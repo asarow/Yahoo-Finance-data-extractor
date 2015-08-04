@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import dev.stockanalyzer.gui.StockGUI;
 import dev.stockanalyzer.pulldata.DataExtractor;
 import dev.stockanalyzer.pulldata.FinancialsExtractor;
+import dev.stockanalyzer.pulldata.DataExporter;
 
 /** 
  * This class is a model view controller which is responsible for acting as a
@@ -20,17 +21,22 @@ public class StockModelViewController {
     private DataExtractor extractor;
     private StockGUI gui;
     private FinancialsExtractor financials;
+    private DataExporter exporter;
     private String savePath;
 
     StockModelViewController(DataExtractor extractor, StockGUI gui, 
-			     FinancialsExtractor financials) {
+			     FinancialsExtractor financials, 
+			     DataExporter exporter) {
 	this.extractor = extractor;
 	this.gui = gui;
 	this.financials = financials;
+	this.exporter = exporter;
 	
 	this.gui.getStockData(new StockButtonListener());
 	this.gui.getFinancialData(new FinancialDataButtonListener());
 	this.gui.findSavePath(new FileButtonListener());
+	this.gui.exportFinancialData(new ExportButtonListener());
+	
     }
      
     class StockButtonListener implements ActionListener {
@@ -70,6 +76,14 @@ public class StockModelViewController {
 	public void actionPerformed(ActionEvent arg0) {
 	    savePath = gui.storeSavePath();
 	    System.out.println(savePath);
+	}
+    }
+
+    class ExportButtonListener implements ActionListener {
+	public void actionPerformed(ActionEvent arg0) {
+	    String statementType = gui.getSelectedButton();
+	    exporter.exportData(savePath, gui.getFinancialStatementsData(), 
+				statementType);
 	}
     }
 }
