@@ -24,7 +24,7 @@ import java.io.*;
 import dev.stockanalyzer.pulldata.DataExtractor;
 
 /** 
- * This class builds the GUI for the stock analyzer and creates getters
+ * This class builds the GUI for the stock analyzer and contains accessors
  * for use in the model view controller class.
  *
  * @author Amandeep Sarow
@@ -50,6 +50,7 @@ public class StockGUI extends JFrame {
     private int numOfPeriods = 4;
     private boolean activeFrame = false;
     private final int x = 450, y = 300, bgX = 850, bgY = 300;
+    private final String ANNUAL = "annual", QUARTERLY = "quarterly";
     private final String[] headers = {"Operating Expenses", 
 				      "Income from Continuing Operations",
 				      "Non-recurring Events", "Assets", 
@@ -104,12 +105,15 @@ public class StockGUI extends JFrame {
 	
 	/* numOfPeriods represents the number of columns needed to 
 	   display the financial data. */
-	if (getSelectedButton().equals("annual")) {
+	if (getSelectedButton().equals(ANNUAL)) {
 	    numOfPeriods = 3;
-	} else if (getSelectedButton().equals("quarterly")) {
+	} else if (getSelectedButton().equals(QUARTERLY)) {
 	    numOfPeriods = 4;
 	}
 
+	/* To ensure both frames are closed when the user hits the 'X' button,
+	   activeFrame is set to true indicating there are multuple windows open 
+	*/
 	activeFrame = true;
 
 	backgroundFrame.setVisible(true);
@@ -340,6 +344,7 @@ public class StockGUI extends JFrame {
     
     /** Adds GUI elements to the center panel. */
     private void addCenterComponents() {
+	// Spaces are placeholders for data to be displayed
 	String[] labels = {"Name: ", "" ,
 			   "Price: ", " ", "Change:", " " , "Market Cap:", " ",
 			   "EBITDA", " ", "PE Ratio" , " "};

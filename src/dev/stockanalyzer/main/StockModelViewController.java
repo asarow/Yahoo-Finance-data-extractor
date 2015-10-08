@@ -58,14 +58,13 @@ public class StockModelViewController {
 
 	    gui.loadBackgroundFrame(statementPeriod);
 	    
-	    financials.pullFinancialData(stockTicker, statementPeriod);
 	    ArrayList<ArrayList<String>> incomeStatement;
 	    ArrayList<ArrayList<String>> balanceSheet;
 	    ArrayList<ArrayList<String>> cashFlowsStatement;
 
-	    incomeStatement = financials.getIncomeStatement();
-	    balanceSheet = financials.getBalanceSheet();
-	    cashFlowsStatement = financials.getCashFlowsStatement();
+	    incomeStatement = financials.getIncomeStatement(stockTicker, statementPeriod);
+	    balanceSheet = financials.getBalanceSheet(stockTicker, statementPeriod);
+	    cashFlowsStatement = financials.getCashFlowsStatement(stockTicker, statementPeriod);
 
 	    gui.displayFinancialStatementsData(incomeStatement, balanceSheet,
 					       cashFlowsStatement);

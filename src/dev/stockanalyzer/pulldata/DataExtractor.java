@@ -1,5 +1,7 @@
 package dev.stockanalyzer.pulldata;
 
+import YahooFinanceYQLWrapper.YQLWrapper;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -19,18 +21,14 @@ import java.util.List;
 
 /**
  * Extracts stock data from the Yahoo! YQL/API and stores the stock data for
- * use in the model view controller.
+ * use in the model view controller. 
  * 
+ * Update: This class now uses an external wrapper for the YQL to retrieve data.
+ * The old code is still available in the GitHub repo history.
  * @author Amandeep Sarow
  */
 public class DataExtractor {
-    private final String yahooApi = "https://query.yahooapis.com/v1/public/" +
-        "yql?q=select%20*%20from%20yahoo.finance.quotes%20where%20symbol%20in%"
-	+ "20(%22";
-    private final String yahooApiEnd = "%22)&diagnostics=true&env=store%3A%" +
-        "2F%2Fdatatables.org%2Falltableswithkeys";
-    private List<String[]> stockTickers = new ArrayList<String[]>();
-    private static final int dataSize = 6;
+    private static final int DATA_SIZE = 6;
     
     public DataExtractor() {
     }
@@ -43,85 +41,15 @@ public class DataExtractor {
      * @return the stock information as an arraylist.
      */
     public String[] pullTickerData (String ticker) {
-	URL url;
-	InputStream is = null;
-	BufferedReader br;
-	String stockXMLLine;
-	String stockData[] = null;
+	String[] stockDataToReturn = new String[DATA_SIZE];
+	stockDataToReturn[0] = YQLWrapper.companyName(ticker);
+	stockDataToReturn[1] = Double.toString(YQLWrapper.stockPrice(ticker));
+	stockDataToReturn[2] = YQLWrapper.changeInPrice(ticker);
+	stockDataToReturn[3] = YQLWrapper.marketCap(ticker);
+	stockDataToReturn[4] = YQLWrapper.EBITDA(ticker);
+	stockDataToReturn[5] = Double.toString(YQLWrapper.PERatio(ticker));
 
-	try {
-	    // The YQL URL which requires modification for the stock ticker 
-	    url = new URL(yahooApi + ticker + yahooApiEnd);
-	    
-	    try {
-		is = url.openStream();  // throws an IOException
-	    } catch (IOException io) {
-		System.out.println("The URL failed to retrieve the stock" +  
-                "ticker from the API");
-		io.printStackTrace();
-		return null;
-	    }
-	    
-	    br = new BufferedReader(new InputStreamReader(is));
-	    
-	    while ((stockXMLLine = br.readLine()) != null) {
-		if (stockXMLLine.contains("LastTradePriceOnly")) {
-		    /* Each line is processed individually starting with the
-		       last trade price of the stock */
-		    stockData = processLine(stockXMLLine, ticker);
-		    stockTickers.add(stockData);
-		}
-	    }
-	} catch (MalformedURLException mue) { 
-	    //TODO: Check the necessities of these exceptions
-	    mue.printStackTrace();
-	} catch (IOException ioe) {
-	    ioe.printStackTrace();
-	} 
-	return stockData;
-    }
-    
-    /**
-     * Processes each line returned from the YQL (in XML format) and returns
-     * the necessary information as an array.
-     *
-     * @param stockLine the relevant line from the XML file.
-     * @param tickerSymbol the stock ticker input by the user.
-     * @return the stock data as an array.
-     */
-    private String[] processLine(String stockLine, String tickerSymbol) {
-	String[] stockData = new String[dataSize];
-	
-	int firstIndex = stockLine.indexOf("<LastTradePriceOnly>") + 20;
-	int lastIndex = stockLine.indexOf("</LastTradePriceOnly>");
-	if (firstIndex == -1 || lastIndex == -1) {
-	    System.out.println(tickerSymbol + " is not a valid ticker");
-	    stockData[0] ="Invalid ticker";
-	    return stockData;		
-	}
-	stockData[1] = stockLine.substring(firstIndex, lastIndex);
-	
-	firstIndex = stockLine.indexOf("<Name>")+6;
-	lastIndex = stockLine.indexOf("</Name>");
-	stockData[0] = stockLine.substring(firstIndex, lastIndex);
-	
-	firstIndex = stockLine.indexOf("<Change>") + 8;
-	lastIndex = stockLine.indexOf("</Change>");
-	stockData[2] = stockLine.substring(firstIndex, lastIndex);
-	
-	firstIndex = stockLine.indexOf("<MarketCapitalization>") + 22;
-	lastIndex = stockLine.indexOf("</MarketCapitalization>");
-	stockData[3] = stockLine.substring(firstIndex, lastIndex);
-	
-	firstIndex = stockLine.indexOf("<EBITDA>") + 8;
-	lastIndex = stockLine.indexOf("</EBITDA>");
-	stockData[4] = stockLine.substring(firstIndex, lastIndex);
-	
-	firstIndex = stockLine.indexOf("<PERatio>") + 9;
-	lastIndex = stockLine.indexOf("</PERatio>");
-	stockData[5] = stockLine.substring(firstIndex, lastIndex);
-	
-	return stockData;
+	return stockDataToReturn;
     }
     
     /**
@@ -130,6 +58,6 @@ public class DataExtractor {
      * @return the number of stock items as data. 
      */
     public static int getDataSize() {
-	return dataSize;
+	return DATA_SIZE;
     }    
 }

@@ -10,7 +10,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Cell;
 
 /**
- * Exports financial statement information in an excel-friendly format.
+ * Exports financial statement information in an excel-friendly format. This
+ * class uses the Apache POI library.
  *
  * @author Amandeep Sarow
  */
@@ -53,8 +54,8 @@ public class DataExporter {
 	    columnLimit = 5;
 	}
 
-	// For debugging purposes (time to export)
-	System.out.println("Printing...");
+	// For debugging purposes (check time to export)
+	//System.out.println("Printing...");
 	
 	int counter = 0; // An indexer for the rows
 	int columnCounter = 0;
