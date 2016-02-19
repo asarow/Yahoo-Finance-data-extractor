@@ -3,7 +3,6 @@ The Yahoo! Finance data extractor is a tool which allows quick retrieval of basi
 
 ## Features
 * An easy to use Graphical User Interface which displays basic financial information
-* A search bar for retrieving stock information of most publicly-traded companies
 * An option to quickly build and view the company's income statement, balance sheet, and statement of cash flows
 * An option to view annual or quarterly financial statements
 * The ability to export annual or quarterly financial statements in an excel-friendly format
